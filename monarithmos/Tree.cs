@@ -12,166 +12,154 @@ using System;
 
 abstract class Expression
 {
-    
-
+    // WARNING: NO PROPERTY
+    public abstract bool   IsValid();
     public abstract double GetValue();
-    public abstract bool IsValid();
-}
-
-abstract class BinOp : Expression
-{
-    protected double? numA = null;
-    protected double? numB = null;
-}
-
-class Sum : BinOp
-{
-    public override bool IsValid()
+    public abstract string AsString();
+    
+    public string AsInParentheses()
     {
-        return numA != null && numB != null;
-    } 
-
-    public override double GetValue()
+        return "(" + AsString() + ")";
+    }
+    
+    public string GetResultString()
     {
-        if(IsValid())
-        {
-            return (double)(numA! + numB!);
-        }
-        else
-        {
-            Console.WriteLine("    ERROR at Tree.cs, in Sum.GetValue(): INVALID EXPRESSION CANNOT BE EVALUATED.");
-            // TODO: EXIT THE PROGRAM WITH AN ERROR.
-            return 0;
-        }
+        return this.AsString() +" = "+ this.GetValue();
     }
 }
 
-class Subtraction : BinOp
+/**
+ * Dependencies: Expression
+ */
+class Number : Expression
 {
+    public double Val { get; set; }
+    
+    public override double GetValue() { return Val;       }
+    public override bool   IsValid()  { return Val!=null; }
+    public override string AsString() { return Val.ToString(); }
+    
+    public Number(double val)
+    {
+        Val = val;
+    }
+}
+
+/**
+ * Dependencies: Expression, Number
+*/
+abstract class BinOp : Expression
+{
+    public Expression A { get; set; }
+    public Expression B { get; set; }
+    
     public override bool IsValid()
     {
-        return numA != null && numB != null;
-    } 
+        return A.IsValid() && B.IsValid();
+    }
+    
+    public abstract override double GetValue();
+    public abstract override string AsString();
+    
+    public BinOp(Expression a, Expression b)
+    {
+        A = a;
+        B = b;
+    }
+    
+    public BinOp(double a, double b):
+        this(new Number(a), new Number(b))
+    { }
+}
 
+class Ratio : BinOp
+{
+    public Ratio (double a, double b):
+        base(a, b)
+    { }
+    
+    public Ratio (Expression a, Expression b):
+        base(a, b)
+    { }
+    
     public override double GetValue()
     {
-        if(IsValid())
-        {
-            return (double)(numA! - numB!);
-        }
+        if (this.IsValid()) return A.GetValue() / B.GetValue();
         else
         {
-            Console.WriteLine("    ERROR at Tree.cs, in Sum.GetValue(): INVALID EXPRESSION CANNOT BE EVALUATED.");
-            // TODO: EXIT THE PROGRAM WITH AN ERROR.
+            // ACTUALLY IT SHOULD EXIT THE PROGRAM, OR RETURN NULL. THEN IT SHOULD BE "double? GetVale()"
+            Console.WriteLine ("INVALID RATIO AAA");
+            
             return 0;
         }
+    }
+    
+    public override string AsString()
+    {
+        string ret = "";
+        if(A is Number)
+            ret += A.AsString();
+        else
+            ret += A.AsInParentheses();
+        
+        ret += "/";
+        
+        if(B is Number && B.GetValue() >= 0)
+            ret += B.AsString();
+        else
+            ret += B.AsInParentheses();
+            
+        return ret;
+    }
+    
+    public override bool IsValid()
+    {
+        return base.IsValid() && B.GetValue() != 0;
     }
 }
 
 class Product : BinOp
 {
-    public override bool IsValid()
-    {
-        return numA != null && numB != null;
-    } 
-
-    public override double GetValue()
-    {
-        if(IsValid())
-        {
-            return (double)(numA! * numB!);
-        }
-        else
-        {
-            Console.WriteLine("    ERROR at Tree.cs, in Sum.GetValue(): INVALID EXPRESSION CANNOT BE EVALUATED.");
-            // TODO: EXIT THE PROGRAM WITH AN ERROR.
-            return 0;
-        }
-    }
-}
-
-class Ratio : BinOp
-{
-    public override bool IsValid()
-    {
-        return numA != null && numB != null && numB != 0;
-    } 
-
-    public override double GetValue()
-    {
-        if(IsValid())
-        {
-            return (double)(numA! / numB!);
-        }
-        else
-        {
-            Console.WriteLine("    ERROR at Tree.cs, in Sum.GetValue(): INVALID EXPRESSION CANNOT BE EVALUATED.");
-            // TODO: EXIT THE PROGRAM WITH AN ERROR.
-            return 0;
-        }
-    }
-}
-
-class Power : BinOp
-{
-    public override bool IsValid()
-    {
-        if(numA != null && numA == 0)
-        {
-            return numB != null && numB > 0; 
-        }
-        else
-        {
-            return numA != null && numB != null;
-        }
-    } 
-
-    public override double GetValue()
-    {
-        if(IsValid())
-        {
-            return Math.Pow((double) numA!, (double) numB!);
-        }
-        else
-        {
-            Console.WriteLine("    ERROR at Tree.cs, in Sum.GetValue(): INVALID EXPRESSION CANNOT BE EVALUATED.");
-            // TODO: EXIT THE PROGRAM WITH AN ERROR.
-            return 0;
-        }
-    }
-}
-
-class Root : BinOp
-{
-    public override bool IsValid()
-    {
-        if(numA != null && numA == 0)
-        {
-            return numB != null && numB > 0; 
-        }
-        else
-        {
-            return numA != null && numB != null;
-        }
-    } 
-
-    public override double GetValue()
-    {
-        if(IsValid())
-        {
-            // rt(a, b) = a^(1/b)
-            return Math.Pow((double) numA!, (double) (1/numB!) );
-        }
-        else
-        {
-            Console.WriteLine("    ERROR at Tree.cs, in Sum.GetValue(): INVALID EXPRESSION CANNOT BE EVALUATED.");
-            // TODO: EXIT THE PROGRAM WITH AN ERROR.
-            return 0;
-        }
-    }
-}
-
-class ArithTree
-{
+    public Product (double a, double b):
+        base(a, b)
+    { }
     
+    public Product (Expression a, Expression b):
+        base(a, b)
+    { }
+    
+    public override double GetValue()
+    {
+        if (this.IsValid()) return A.GetValue() * B.GetValue();
+        else
+        {
+            // ACTUALLY IT SHOULD EXIT THE PROGRAM, OR RETURN NULL. THEN IT SHOULD BE "double? GetVale()"
+            Console.WriteLine ("INVALID RATIO AAA");
+            
+            return 0;
+        }
+    }
+    
+    public override string AsString()
+    {
+        string ret = "";
+        if(A is Number)
+            ret += A.AsString();
+        else
+            ret += A.AsInParentheses();
+        
+        ret += "*";
+        
+        if(B is Number && B.GetValue() >= 0)
+            ret += B.AsString();
+        else
+            ret += B.AsInParentheses();
+            
+        return ret;
+    }
+    
+    public override bool IsValid()
+    {
+        return base.IsValid();
+    }
 }
