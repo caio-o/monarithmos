@@ -256,3 +256,42 @@ class Power : BinOp
     public Power (double     a, double     b):  base(a, b) { }
     public Power (Expression a, Expression b):  base(a, b) { }
 }
+
+class Root : BinOp
+{
+    public override string AsString()
+    {
+        string ret = "";
+        if (A is Number)
+        {
+            if (A.GetValue() >= 0 && A.GetValue() != 2)
+                ret += A.AsString();
+        }
+        else
+            ret += A.AsInParentheses();
+        
+        ret += "√";
+        
+        if (B is Number && B.GetValue() >= 0)
+            ret += B.AsString();
+        else
+            ret += B.AsInParentheses();
+            
+        return ret;
+    }
+    
+    public override bool IsValid() 
+    { 
+        return base.IsValid() && A.GetValue() > 0 && B.GetValue() > 0;
+    }
+    
+    public override double GetValue()
+    {
+        if (this.IsValid()) return Math.Pow(B.GetValue(), 1/(A.GetValue()));
+        else 
+            return 0; //TODO: ACTUALLY TERMINATE
+    }
+    
+    public Root (double     a, double     b):  base(a, b) { }
+    public Root (Expression a, Expression b):  base(a, b) { }
+}
