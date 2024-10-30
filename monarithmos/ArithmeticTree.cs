@@ -2,20 +2,20 @@
  *  AUTHOR : Caio e Silva Barbieri (github: caio-o)
  *  DATE   : 24/10/2024, 10:34
  *  
- *      FILE containing definitions and inpplementations of the classes necessary for 
+ *      FILE containing definitions and implementations of the classes necessary for 
  *  the arithmetic expression tree. As of they are all here, but soon they will be  
  *  transported to their on files, as decoupled modules.
  */
 
-using Windows.Data.Xml.Dom;
 using System;
 
 abstract class Expression
 {
     // WARNING: NO PROPERTY
-    public abstract bool   IsValid();
-    public abstract double GetValue();
-    public abstract string AsString();
+    public abstract bool    IsValid();
+    public abstract double  GetValue();
+    public abstract string  AsString();
+    public override string? ToString() { return AsString(); } 
     
     public string AsInParentheses()
     {
@@ -74,13 +74,9 @@ abstract class BinOp : Expression
 
 class Ratio : BinOp
 {
-    public Ratio (double a, double b):
-        base(a, b)
-    { }
+    public Ratio (double a, double b):          base(a, b) { }
     
-    public Ratio (Expression a, Expression b):
-        base(a, b)
-    { }
+    public Ratio (Expression a, Expression b):  base(a, b) { }
     
     public override double GetValue()
     {
@@ -120,13 +116,9 @@ class Ratio : BinOp
 
 class Product : BinOp
 {
-    public Product (double a, double b):
-        base(a, b)
-    { }
+    public Product (double a, double b):          base(a, b) { }
     
-    public Product (Expression a, Expression b):
-        base(a, b)
-    { }
+    public Product (Expression a, Expression b):  base(a, b) { }
     
     public override double GetValue()
     {
@@ -166,10 +158,7 @@ class Product : BinOp
 
 class Sum : BinOp
 {
-    public override bool IsValid()
-    {
-        return base.IsValid();
-    }
+    public override bool IsValid() { return base.IsValid(); }
 
     public override double GetValue()
     {
@@ -195,13 +184,9 @@ class Sum : BinOp
         return ret; 
     }
 
-    public Sum (Expression a, Expression b):
-        base (a, b)
-    { }
+    public Sum (double a, double b):          base (a, b) { }
+    public Sum (Expression a, Expression b):  base (a, b) { }
 
-    public Sum (double a, double b):
-        base (a, b)
-    { }
 }
 
 class Difference : BinOp
@@ -235,11 +220,39 @@ class Difference : BinOp
         return ret; 
     }
 
-    public Difference (Expression a, Expression b):
-        base (a, b)
-    { }
+    public Difference (Expression a, Expression b):  base (a, b)  { }
+    public Difference (double a, double b):          base (a, b)  { }
+}
 
-    public Difference (double a, double b):
-        base (a, b)
-    { }
+class Power : BinOp
+{
+    public override string AsString()
+    {
+        string ret = "";
+        if (A is Number && A.GetValue() >= 0)
+            ret += A.AsString();
+        else
+            ret += A.AsInParentheses();
+        
+        ret += "^";
+        
+        if (B is Number && B.GetValue() >= 0)
+            ret += B.AsString();
+        else
+            ret += B.AsInParentheses();
+            
+        return ret;
+    }
+    
+    public override bool IsValid() { return base.IsValid(); }
+    
+    public override double GetValue()
+    {
+        if (this.IsValid()) return Math.Pow(A.GetValue(), B.GetValue());
+        else 
+            return 0; //TODO: ACTUALLY TERMINATE
+    }
+    
+    public Power (double     a, double     b):  base(a, b) { }
+    public Power (Expression a, Expression b):  base(a, b) { }
 }
