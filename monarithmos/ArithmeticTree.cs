@@ -12,12 +12,12 @@ using System;
 abstract class Expression
 {
     // WARNING: NO PROPERTY
-    public abstract bool    IsValid();
+    public abstract bool    IsValid(); // IsValid = is well formed and can be calculated
     public abstract double  GetValue();
-    public abstract string  AsString();
+    public abstract string  AsString(); // Defined as abstract so all expeessions have a visual representation
     public override string? ToString() { return AsString(); } 
     
-    public string AsInParentheses()
+    public string AsInParentheses() 
     {
         return "(" + AsString() + ")";
     }
@@ -32,10 +32,11 @@ abstract class Expression
  * Dependencies: Expression
  */
 class Number : Expression
+// Numbers are the leaves of the Tree.
 {
     public double Val { get; set; }
     
-    public override double GetValue() { return Val;       }
+    public override double GetValue() { return Val;            }
     public override bool   IsValid()  { return true          ; }
     public override string AsString() { return Val.ToString(); }
     
@@ -49,7 +50,10 @@ class Number : Expression
  * Dependencies: Expression, Number
 */
 abstract class BinOp : Expression
-{
+{ // As a consequence of the inheritance hierarchy, complex expressions 
+// take the form of a Tree, and evaluating the Expression means evaluating 
+// the operator of lowest precedence (the root). The process works down recirsively.
+// This applies to these methods: IsValid, GetValue, and AsString.
     public Expression A { get; set; }
     public Expression B { get; set; }
     
@@ -57,9 +61,11 @@ abstract class BinOp : Expression
     {
         return A.IsValid() && B.IsValid();
     }
-    
+
+    // Redefine as abstract again since every operation
+    // has a different calculation and a different format.
     public abstract override double GetValue();
-    public abstract override string AsString();
+    public abstract override string AsString(); 
     
     public BinOp(Expression a, Expression b)
     {
@@ -174,7 +180,7 @@ class Sum : BinOp
         else
             ret += A.AsInParentheses();
         
-        ret += " + ";
+        ret += " + "; // Addition operator
         
         if(B is Number && B.GetValue() >= 0)
             ret += B.AsString();
@@ -210,7 +216,7 @@ class Difference : BinOp
         else
             ret += A.AsInParentheses();
         
-        ret += " - ";
+        ret += " - "; // Subtraction operator
         
         if(B is Number && B.GetValue() >= 0)
             ret += B.AsString();
@@ -234,7 +240,7 @@ class Power : BinOp
         else
             ret += A.AsInParentheses();
         
-        ret += "^";
+        ret += "^"; // exponent operator
         
         if (B is Number && B.GetValue() >= 0)
             ret += B.AsString();
@@ -259,6 +265,8 @@ class Power : BinOp
 
 class Root : BinOp
 {
+    // A and B here are in order from left to right
+    // i.e., A=2, B=4 -> square root of 4
     public override string AsString()
     {
         string ret = "";
@@ -270,7 +278,7 @@ class Root : BinOp
         else
             ret += A.AsInParentheses();
         
-        ret += "√";
+        ret += "√"; // root operator
         
         if (B is Number && B.GetValue() >= 0)
             ret += B.AsString();
@@ -282,12 +290,15 @@ class Root : BinOp
     
     public override bool IsValid() 
     { 
+        // Non-real roots (roots of negatives) are not implemented.
         return base.IsValid() && A.GetValue() > 0 && B.GetValue() > 0;
     }
     
     public override double GetValue()
     {
-        if (this.IsValid()) return Math.Pow(B.GetValue(), 1/(A.GetValue()));
+        if (this.IsValid()) 
+            // root property: XrootY = Y^(1/X)
+            return Math.Pow(B.GetValue(), 1/(A.GetValue()));
         else 
             return 0; //TODO: ACTUALLY TERMINATE
     }
