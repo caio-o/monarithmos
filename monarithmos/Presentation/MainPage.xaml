@@ -19,9 +19,13 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Spacing="16">
-        <TextBox Text="{Binding Name, Mode=TwoWay}"
-            PlaceholderText="Enter your name:" />
-        <Button Content="Go to Second Page"
+        <TextBlock Text="MONARITHMOS" HorizontalAlignment="Center" Foreground="Blue" FontWeight="Bold" FontFamily="Times New Roman" FontSize="22"/>
+        <Image Width="200" Name="Logo">
+          <Image.Source>
+            <BitmapImage DecodePixelWidth="200" UriSource="ms-appx:///Assets/Images/logo.png" /> 
+          </Image.Source>
+        </Image>
+        <Button Content="Select Mode"
             AutomationProperties.AutomationId="SecondPageButton"
             Command="{Binding GoToSecond}" />
       </StackPanel>
