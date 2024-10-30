@@ -36,7 +36,7 @@ class Number : Expression
     public double Val { get; set; }
     
     public override double GetValue() { return Val;       }
-    public override bool   IsValid()  { return Val!=null; }
+    public override bool   IsValid()  { return true          ; }
     public override string AsString() { return Val.ToString(); }
     
     public Number(double val)
@@ -162,4 +162,84 @@ class Product : BinOp
     {
         return base.IsValid();
     }
+}
+
+class Sum : BinOp
+{
+    public override bool IsValid()
+    {
+        return base.IsValid();
+    }
+
+    public override double GetValue()
+    {
+        if (this.IsValid())    return A.GetValue() + B.GetValue();
+        else                   return 0; // TODO: terminate the program
+    }
+
+    public override string AsString()
+    {
+        string ret = "";
+        if(A is Number)
+            ret += A.AsString();
+        else
+            ret += A.AsInParentheses();
+        
+        ret += " + ";
+        
+        if(B is Number && B.GetValue() >= 0)
+            ret += B.AsString();
+        else
+            ret += B.AsInParentheses();
+            
+        return ret; 
+    }
+
+    public Sum (Expression a, Expression b):
+        base (a, b)
+    { }
+
+    public Sum (double a, double b):
+        base (a, b)
+    { }
+}
+
+class Difference : BinOp
+{
+    public override bool IsValid()
+    {
+        return base.IsValid();
+    }
+
+    public override double GetValue()
+    {
+        if (this.IsValid())    return A.GetValue() - B.GetValue();
+        else                   return 0; // TODO: terminate the program
+    }
+
+    public override string AsString()
+    {
+        string ret = "";
+        if(A is Number)
+            ret += A.AsString();
+        else
+            ret += A.AsInParentheses();
+        
+        ret += " - ";
+        
+        if(B is Number && B.GetValue() >= 0)
+            ret += B.AsString();
+        else
+            ret += B.AsInParentheses();
+            
+        return ret; 
+    }
+
+    public Difference (Expression a, Expression b):
+        base (a, b)
+    { }
+
+    public Difference (double a, double b):
+        base (a, b)
+    { }
 }
