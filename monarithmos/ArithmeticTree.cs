@@ -99,7 +99,7 @@ class Ratio : BinOp
     public override string AsString()
     {
         string ret = "";
-        if(A is Number)
+        if(A is Number || A is Product)
             ret += A.AsString();
         else
             ret += A.AsInParentheses();
@@ -141,14 +141,14 @@ class Product : BinOp
     public override string AsString()
     {
         string ret = "";
-        if(A is Number)
+        if(A is Number || A is Product || A is Power)
             ret += A.AsString();
         else
             ret += A.AsInParentheses();
         
         ret += "*";
         
-        if(B is Number && B.GetValue() >= 0)
+        if((B is Number || B is Product || B is Power || B is Ratio) && B.GetValue() >= 0)
             ret += B.AsString();
         else
             ret += B.AsInParentheses();
@@ -175,14 +175,14 @@ class Sum : BinOp
     public override string AsString()
     {
         string ret = "";
-        if(A is Number)
+        if(A is Number || A is Sum || A is Difference)
             ret += A.AsString();
         else
             ret += A.AsInParentheses();
         
         ret += " + "; // Addition operator
         
-        if(B is Number && B.GetValue() >= 0)
+        if((B is Number || B is Sum || B is Difference) && B.GetValue() >= 0)
             ret += B.AsString();
         else
             ret += B.AsInParentheses();
@@ -211,14 +211,14 @@ class Difference : BinOp
     public override string AsString()
     {
         string ret = "";
-        if(A is Number)
+        if(A is Number || A is Sum || A is Difference || A is Power)
             ret += A.AsString();
         else
             ret += A.AsInParentheses();
         
         ret += " - "; // Subtraction operator
         
-        if(B is Number && B.GetValue() >= 0)
+        if((B is Number || B is Sum || B is Difference || B is Power) && B.GetValue() >= 0)
             ret += B.AsString();
         else
             ret += B.AsInParentheses();
