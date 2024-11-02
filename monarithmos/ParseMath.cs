@@ -34,15 +34,6 @@ class MathParser
 		if (!end && cursor == ' ')
 			nextChar();
 	}
-
-	private void skip(int steps)
-	{
-		int tmp = count;
-		while(count+1 < buffer.Length && count < tmp+steps)
-		{
-			count++;
-		}
-	}
 	
 	public Expression? Parse(string buff)
 	{
