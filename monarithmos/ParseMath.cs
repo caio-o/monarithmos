@@ -19,7 +19,7 @@ class MathParser
 		       (ch == '8') || (ch == '9');
 	}
 
-	private void nextChar()
+	private void NextChar()
 	{
 		if(count+1 < buffer.Length)
 		{
@@ -32,7 +32,7 @@ class MathParser
 		}
 
 		if (!end && cursor == ' ')
-			nextChar();
+			NextChar();
 	}
 	
 	public Expression? Parse(string buff)
@@ -67,7 +67,7 @@ class MathParser
 		{ // some would call this block  " E' " or " Edash ". It specifies what can follow a term (either sum/diff or nothing).
 			if(cursor == '+')
 			{
-				nextChar();
+				NextChar();
 				
 				tmp = ret;
 				ret = T();
@@ -75,7 +75,7 @@ class MathParser
 			}
 			else
 			{
-				nextChar();
+				NextChar();
 
 				tmp = ret;
 				ret = T();
@@ -97,7 +97,7 @@ class MathParser
 		{ // Some would call thhis block " T' " or " Tdash ". It specifies what may follow a Factor (either multiply/divide or nothing)
 			if(cursor == '*')
 			{
-				nextChar();
+				NextChar();
 				tmp = ret;
 				ret = F();
 				if(ret != null) ret = new Product(tmp, ret);
@@ -105,7 +105,7 @@ class MathParser
 
 			else 
 			{
-				nextChar();
+				NextChar();
 				tmp = ret;
 				ret = F();
 				if(ret != null) ret = new Ratio(tmp, ret);
@@ -123,12 +123,12 @@ class MathParser
 
 		if(cursor == '(')
 		{
-			nextChar();
+			NextChar();
 			ret = E();
 			if(ret != null)
 			{
 				if (cursor == ')')
-					nextChar();
+					NextChar();
 			}
 			else
 			{
@@ -168,7 +168,7 @@ class MathParser
 			num = double.Parse (buffer.Substring (count, size));
 
 			count += size-1;
-			nextChar();
+			NextChar();
 
 			Console.WriteLine("Updating cursor: ");
 			cursor = buffer[count];
